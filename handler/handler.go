@@ -22,7 +22,7 @@ func Userhandler(w http.ResponseWriter, r *http.Request) {
 
 func PostUsers(w http.ResponseWriter, r *http.Request){
 var users models.BDEUser
-users.FullName =r.FormValue("fullname")
+users.FullName =r.FormValue("full_name")
 users.Email=r.FormValue("email")
 users.Phone=r.FormValue("phone")
 users.PasswordHash=r.FormValue("password")
@@ -30,8 +30,8 @@ users.DrivingLicense=r.FormValue("driving_license")
 users.Role=r.FormValue("role")
 users.Status=r.FormValue("status")
 
-if users.FullName == "" || users.Email == "" || users.Phone =="" || users.PasswordHash ==""{
-			http.Error(w, "Name,Email,phone and password are required", http.StatusBadRequest)
+if users.FullName == "" || users.Email == "" || users.Phone =="" || users.PasswordHash ==""|| users.DrivingLicense==""{
+			http.Error(w, "Name,Email,phone,password and driving license are required", http.StatusBadRequest)
 			return
 		}
 		if users.Role == "" {
@@ -41,7 +41,7 @@ if users.FullName == "" || users.Email == "" || users.Phone =="" || users.Passwo
 			users.Status = "ACTIVE"
 		}
 		
-		id, err := helper.Insertuser(users.FullName,users.Email,users.Phone,users.PasswordHash,users.DrivingLicense)
+		id, err := helper.Insertuser(users.FullName,users.Email,users.Phone,users.PasswordHash,users.DrivingLicense,users.Role,users.Status)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return

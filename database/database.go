@@ -32,23 +32,22 @@ func ConnectDatabase() {
 	}
 	fmt.Println("Database connection established")
 
-	createTable := `CREATE TABLE IF NOT EXIST bde_users
-	id SERIAL PRIMARY KEY,
-	full_name TEXT NOT NULL,
-	email TEXT UNIQUE NOT NULL,
-	phone TEXT UNIQUE NOT NULL,
-	password_hash TEXT NOT NULL,
-	driving_license TEXT,
-	role TEXT DEFAULT 'BDE' CHECK(role IN ('BDE','Manager','Admin')),
-	join_date DATE DEFAULT CURRENT_DATE ,
-	status TEXT DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE','INACTIVE')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-`
-	_, err = helper.DB.Exec(createTable)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Table created successfully")
+	// createTable := `CREATE TABLE IF NOT EXISTS bde_users(
+	// id SERIAL PRIMARY KEY,
+	// full_name TEXT NOT NULL,
+	// email TEXT UNIQUE NOT NULL,
+	// phone TEXT UNIQUE NOT NULL,
+	// password_hash TEXT NOT NULL,
+	// driving_license TEXT,
+	// role TEXT DEFAULT 'BDE' CHECK(role IN ('BDE','Manager','Admin')),
+	// join_date DATE DEFAULT CURRENT_DATE ,
+	// status TEXT DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE','INACTIVE')),
+    // created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    // updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
+	// _, err = helper.DB.Exec(createTable)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println("Table created successfully")
 
 }

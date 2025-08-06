@@ -1,8 +1,10 @@
 package helper
 
 import (
-	// "Error"
 	"database/sql"
+
+	_ "github.com/lib/pq"
+
 	"fmt"
 
 	"lantorabde.app/models"
@@ -10,11 +12,11 @@ import (
 
 var DB *sql.DB
 
-func Insertuser(FullName string, Email string, Phone string, PasswordHash string, DrivingLicense string) (uint, error) {
+func Insertuser(FullName string, Email string, Phone string, PasswordHash string, DrivingLicense string,Role string,Status string ) (uint, error) {
 	var id uint
-	query := `INSERT INTO billing (FullName,Email,Phone,PasswordHash,DrivingLicense,join_date,created_at,updated_at) 
-              VALUES ($1, $2,$3,$4,$5,NOW(),NOW(),NOW()) RETURNING id`
-	err := DB.QueryRow(query, FullName, Email, Phone, PasswordHash, DrivingLicense).Scan(&id)
+	query := `INSERT INTO bde_users (full_name,email,phone,password_hash,driving_license,role,join_date,status,created_at,updated_at) 
+              VALUES ($1, $2,$3,$4,$5,$6,NOW(),$7,NOW(),NOW()) RETURNING id`
+	err := DB.QueryRow(query, FullName, Email, Phone, PasswordHash, DrivingLicense,Role,Status).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
