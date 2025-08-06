@@ -2,6 +2,7 @@ package helper
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/lib/pq"
 
@@ -22,7 +23,6 @@ func Insertuser(FullName string, Email string, Phone string, PasswordHash string
 	}
 	return id, nil
 }
-
 func GetUsers() ([]models.BDEUser, error) {
 	rows, err := DB.Query(`
 			SELECT id,full_name,email,phone,password_hash,driving_license,role,join_date,status,created_at,updated_at  
@@ -39,6 +39,7 @@ func GetUsers() ([]models.BDEUser, error) {
 	for rows.Next() {
 		var user models.BDEUser
 		err := rows.Scan(
+			&user.ID,
 			&user.FullName,
 			&user.Phone,
 			&user.Email,
@@ -59,4 +60,25 @@ func GetUsers() ([]models.BDEUser, error) {
 	fmt.Println("GetUsersSuccessful")
 
 	return usersList, nil
+}
+
+func DeleteUser(id uint) error {
+	result, err := DB.Exec(`
+		DELETE FROM bde_users
+		WHERE id = $1
+	`, id)
+	if err != nil {
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return errors.New("User not found")
+	}
+
+	return nil
 }

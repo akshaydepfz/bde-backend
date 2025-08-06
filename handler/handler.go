@@ -1,9 +1,9 @@
 package handler
 import(
  	"encoding/json"
-	// "fmt"
+	"fmt"
 	"net/http"
-	// "strconv"
+	"strconv"
 	 "time"
 	"lantorabde.app/models"
 	"lantorabde.app/helper"
@@ -14,7 +14,9 @@ func Userhandler(w http.ResponseWriter, r *http.Request) {
 			PostUsers(w, r)
 		} else if r.Method == http.MethodGet {
 			GetUsers(w, r)
-		}  else {
+		}  else if r.Method == http.MethodDelete{
+			DeleteUsers(w,r)
+		}else {
 			http.Error(w, "Invalid request method", http.StatusBadRequest)
 		}
 
@@ -36,9 +38,16 @@ if users.FullName == "" || users.Email == "" || users.Phone =="" || users.Passwo
 		}
 		if users.Role == "" {
 			users.Role = "BDE"
+		} else if users.Role != "BDE" && users.Role != "Manager" && users.Role != "Admin" {
+			http.Error(w, "Invalid role: must be 'BDE', 'Manager', or 'Admin'", http.StatusBadRequest)
+			return
 		}
+		
 		if users.Status == "" {
 			users.Status = "ACTIVE"
+		} else if users.Status != "ACTIVE" && users.Status != "INACTIVE" {
+			http.Error(w, "Invalid status: must be 'ACTIVE' or 'INACTIVE'", http.StatusBadRequest)
+			return
 		}
 		
 		id, err := helper.Insertuser(users.FullName,users.Email,users.Phone,users.PasswordHash,users.DrivingLicense,users.Role,users.Status)
@@ -69,6 +78,32 @@ if users.FullName == "" || users.Email == "" || users.Phone =="" || users.Passwo
 	json.NewEncoder(w).Encode(users)
 
 }
+
+func DeleteUsers(w http.ResponseWriter, r *http.Request){
+
+	idStr := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	err = helper.DeleteUser(uint(id))
+	if err != nil {
+		if err.Error() == "User not found" {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Failed to delete User: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Printf("✅ User with ID %d deleted successfully\n", id)
+	w.WriteHeader(http.StatusNoContent)
+
+
+}
+
+
 
 
 
