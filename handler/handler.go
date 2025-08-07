@@ -21,6 +21,39 @@ func Userhandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 }
+func Userhandlerget(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet{
+		GetUserid(w, r)
+	}else {
+		http.Error(w, "Invalid request method", http.StatusBadRequest)
+	}
+
+
+}
+func GetUserid(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	user, err := helper.GetUser(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Return user in JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+}
+
 
 func PostUsers(w http.ResponseWriter, r *http.Request){
 var users models.BDEUser

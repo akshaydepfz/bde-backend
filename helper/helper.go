@@ -61,6 +61,36 @@ func GetUsers() ([]models.BDEUser, error) {
 
 	return usersList, nil
 }
+func GetUser(id int) (*models.BDEUser, error) {
+	row := DB.QueryRow(`
+		SELECT id, full_name, email, phone, password_hash, driving_license, role, join_date, status, created_at, updated_at  
+		FROM bde_users
+		WHERE id = $1
+	`, id)
+
+	var user models.BDEUser
+
+	err := row.Scan(
+		&user.ID,
+		&user.FullName,
+		&user.Email,
+		&user.Phone,
+		&user.PasswordHash,
+		&user.DrivingLicense,
+		&user.Role,
+		&user.JoinDate,
+		&user.Status,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("GetUserSuccessful")
+	return &user, nil
+}
 
 func DeleteUser(id uint) error {
 	result, err := DB.Exec(`
