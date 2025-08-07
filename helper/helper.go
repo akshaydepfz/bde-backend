@@ -41,8 +41,8 @@ func GetUsers() ([]models.BDEUser, error) {
 		err := rows.Scan(
 			&user.ID,
 			&user.FullName,
-			&user.Phone,
 			&user.Email,
+			&user.Phone,
 			&user.PasswordHash,
 			&user.DrivingLicense,
 			&user.Role,
@@ -113,26 +113,35 @@ func DeleteUser(id uint) error {
 	return nil
 }
 
-func PutUser(id uint,full_name string, email string, phone string, password_hash string,driving_license string,role string,status string)error{
-	
-		result, err := DB.Exec(`
-			UPDATE bde_users
-			SET full_name = $1, email = $2
-			WHERE id = $3
-		`, full_name, email, id)
-		if err != nil {
-			return err
-		}
-	
-		rows, err := result.RowsAffected()
-	
-		if err != nil {
-			return err
-		}
-		if rows == 0 {
-			return errors.New("customer not found")
-		}
-	
-		return nil
+func PutUser(
+	id uint,
+	full_name, email, phone, password_hash, driving_license, role, status string,
+) error {
+
+	result, err := DB.Exec(`
+		UPDATE bde_users
+		SET full_name = $1,
+			email = $2,
+			phone = $3,
+			password_hash = $4,
+			driving_license = $5,
+			role = $6,
+			status = $7
+		WHERE id = $8
+	`, full_name, email, phone, password_hash, driving_license, role, status, id)
+
+	if err != nil {
+		return err
 	}
-	
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return errors.New("customer not found")
+	}
+
+	return nil
+}
