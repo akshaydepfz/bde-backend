@@ -13,11 +13,11 @@ import (
 
 var DB *sql.DB
 
-func Insertuser(FullName string, Email string, Phone string, PasswordHash string, DrivingLicense string,Role string,Status string ) (uint, error) {
+func Insertuser(FullName string, Email string, Phone string, PasswordHash string, DrivingLicense string, Role string, Status string) (uint, error) {
 	var id uint
 	query := `INSERT INTO bde_users (full_name,email,phone,password_hash,driving_license,role,join_date,status,created_at,updated_at) 
               VALUES ($1, $2,$3,$4,$5,$6,NOW(),$7,NOW(),NOW()) RETURNING id`
-	err := DB.QueryRow(query, FullName, Email, Phone, PasswordHash, DrivingLicense,Role,Status).Scan(&id)
+	err := DB.QueryRow(query, FullName, Email, Phone, PasswordHash, DrivingLicense, Role, Status).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -141,6 +141,29 @@ func PutUser(
 
 	if rows == 0 {
 		return errors.New("customer not found")
+	}
+
+	return nil
+}
+
+func LoginUser(Email, Password string) error {
+	var storedPassword string
+
+	err := DB.QueryRow(`
+		SELECT password_hash
+		FROM bde_users
+		WHERE email = $1
+	`, Email).Scan(&storedPassword)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("user not found")
+		}
+		return err
+	}
+
+	if storedPassword != Password {
+		return errors.New("invalid password")
 	}
 
 	return nil

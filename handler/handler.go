@@ -33,6 +33,32 @@ func Userhandlerget(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func Loginhandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		login(w, r)
+	} else {
+		http.Error(w, "Invalid request method", http.StatusBadRequest)
+	}
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	var log models.BDEUser
+	log.Email = r.FormValue("email")
+	log.PasswordHash = r.FormValue("password")
+	if log.Email == "" || log.PasswordHash == "" {
+		http.Error(w, "Email and password are required", http.StatusBadRequest)
+		return
+	}
+	err := helper.LoginUser(log.Email, log.PasswordHash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Login successful"))
+
+}
 func GetUserid(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -52,7 +78,6 @@ func GetUserid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return user in JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
